@@ -42,7 +42,7 @@ func main() {
 		zlog.Error("Erro ao conectar com o banco de dados. (%e)", zap.Error(err))
 	}
 
-	zlog.Debug("Criando tabela buckets")
-	db.AutoMigrate(&models.Bucket{})
+	zlog.Debug("Criando tabela objects")
+	db.AutoMigrate(&models.Objects{}, &models.Buckets{})
 
 }
