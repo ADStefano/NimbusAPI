@@ -43,6 +43,6 @@ func main() {
 	}
 
 	zlog.Debug("Criando tabela objects")
-	db.AutoMigrate(&models.Objects{}, &models.Buckets{})
+	db.AutoMigrate(&models.Objects{}, &models.Buckets{}, &models.Executions{})
 
 }
