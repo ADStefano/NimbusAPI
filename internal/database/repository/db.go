@@ -1,14 +1,13 @@
 package repository
 
 import (
-	"github.com/ADStefano/NimbusAPI/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func Conect() (*gorm.DB, error) {
+func Conect(cstr string) (*gorm.DB, error) {
 
-	db, err := gorm.Open(postgres.Open(config.DSN), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(cstr), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

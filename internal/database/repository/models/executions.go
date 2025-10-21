@@ -22,6 +22,7 @@ func (s status) Value() (driver.Value, error) {
 
 // Necesário criar o status antes no banco de dados
 type Executions struct {
+	Objects Objects `gorm:"foreignKey:ObjectID"`
 	ID         uint   `gorm:"primaryKey;autoIncrement;unique;not null"`
 	BucketID   uint   `gorm:"not null;index;"`
 	ObjectID   uint   `gorm:"not null;index;foreignKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
