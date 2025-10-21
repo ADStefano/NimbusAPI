@@ -1,16 +1,41 @@
 package config
 
-// TODO TROCAR PARA VIPER
-var (
-	AppVersion = "development"
-	AppName    = "nimbus_api"
-	AppPort    = "8080"
-	AppEnv     = "development"
-	DBHost     = "localhost"
-	DBPort     = "5432"
-	DBUser     = "root"
-	DBPassword = "root"
-	DBName     = "nimbus"
-	LOG_LEVEL  = "debug"
-	DSN = "postgres://root:root@localhost:5432/nimbus"
+import (
+	"fmt"
+	"reflect"
+
+	"github.com/spf13/viper"
 )
+
+type AppConfig struct {
+	AppVersion string `mapstructure:"APP_VERSION"`
+	AppName    string `mapstructure:"APP_NAME"`
+	AppEnv     string `mapstructure:"APP_ENV"`
+	Port       string `mapstructure:"APP_PORT"`
+	LogLevel   string `mapstructure:"LOG_LEVEL"`
+	DB_CONN    string `mapstructure:"DB_CONN"`
+}
+
+func LoadConfig() *AppConfig {
+
+	cfg := AppConfig{}
+
+	// Não lê as chaves sem o bind env ou se não ler um aquivo, por isso o for loop
+	viper.AutomaticEnv()
+
+	t := reflect.TypeOf(cfg)
+	for i := 0; i < t.NumField(); i++ {
+		tag := t.Field(i).Tag.Get("mapstructure")
+		if tag != "" {
+			_ = viper.BindEnv(tag)
+		}
+	}
+
+	err := viper.Unmarshal(&cfg)
+	if err != nil {
+		panic(fmt.Errorf("unable to decode into struct: %w", err))
+	}
+
+	return &cfg
+
+}

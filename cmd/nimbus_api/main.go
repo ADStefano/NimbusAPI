@@ -1,16 +1,15 @@
 package main
 
 import (
-	// "context"
-	// "time"
+	"context"
+	"time"
 
-	// "github.com/ADStefano/AmazonHandler/s3handler"
+	"github.com/ADStefano/AmazonHandler/s3handler"
+	"github.com/ADStefano/NimbusAPI/internal/config"
 	"github.com/ADStefano/NimbusAPI/internal/database/repository"
-	"github.com/ADStefano/NimbusAPI/internal/database/repository/models"
 	"github.com/ADStefano/NimbusAPI/internal/logger"
-
-	// "github.com/aws/aws-sdk-go-v2/config"
-	// "github.com/aws/aws-sdk-go-v2/service/s3"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"go.uber.org/zap"
 )
 
@@ -19,30 +18,31 @@ func main() {
 	zlog := logger.CreateLogger()
 	defer zlog.Sync()
 
-	// cfg, err := config.LoadDefaultConfig(context.Background())
-	// if err != nil {
-	// 	zlog.Error("Erro ao carregar as configurações. (%e)", zap.Error(err))
-	// }
+	cfgS3, err := awsConfig.LoadDefaultConfig(context.Background())
+	if err != nil {
+		zlog.Error("Erro ao carregar as configurações. (%e)", zap.Error(err))
+	}
 
-	// client := s3.NewFromConfig(cfg)
+	client := s3.NewFromConfig(cfgS3)
 
-	// handler := s3handler.NewS3Client(client)
-	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-	// obj, err := handler.ListObjects("adstefano", "", 12, ctx)
-	// if err != nil {
-	// 	zlog.Error("Erro ao listar os objetos. (%e)", zap.Error(err))
-	// }
-	// for _, o := range obj {
-	// 	zlog.Info("Objeto encontrado", zap.String("key", *o.Key), zap.Int64("tamanho", *o.Size))
-	// }
+	handler := s3handler.NewS3Client(client)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	obj, err := handler.ListObjects("adstefano", "", 12, ctx)
+	if err != nil {
+		zlog.Error("Erro ao listar os objetos. (%e)", zap.Error(err))
+	}
+	for _, o := range obj {
+		zlog.Info("Objeto encontrado", zap.String("key", *o.Key), zap.Int64("tamanho", *o.Size))
+	}
 
-	db, err := repository.Conect()
+	cfg := config.LoadConfig()
+	db, err := repository.Conect(cfg.DB_CONN)
 	if err != nil {
 		zlog.Error("Erro ao conectar com o banco de dados. (%e)", zap.Error(err))
 	}
 
-	zlog.Debug("Criando tabela objects")
-	db.AutoMigrate(&models.Objects{}, &models.Buckets{}, &models.Executions{})
+	print(db)
+	// db.AutoMigrate(&models.Objects{}, &models.Buckets{}, &models.Executions{})
 
 }
