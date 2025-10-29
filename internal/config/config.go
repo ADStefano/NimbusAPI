@@ -33,7 +33,7 @@ func LoadConfig() *AppConfig {
 
 	err := viper.Unmarshal(&cfg)
 	if err != nil {
-		panic(fmt.Errorf("unable to decode into struct: %w", err))
+		panic(fmt.Errorf("erro ao decodificar as envs para o struct: %w", err))
 	}
 
 	return &cfg

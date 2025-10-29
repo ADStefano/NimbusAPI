@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"os"
 	"strings"
 
 	"go.uber.org/zap"
@@ -9,13 +8,13 @@ import (
 )
 
 // CreateLogger cria um logger configurado utilizando o zap.
-func CreateLogger() *zap.Logger {
+func CreateLogger(logLevel string) *zap.Logger {
 	encoderCfg := zap.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = "timestamp"
 	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	config := zap.Config{
-		Level:             zap.NewAtomicLevelAt(getLogLevelFromEnv()),
+		Level:             zap.NewAtomicLevelAt(getLogLevelFromEnv(logLevel)),
 		Development:       false,
 		DisableCaller:     false,
 		DisableStacktrace: false,
@@ -34,8 +33,8 @@ func CreateLogger() *zap.Logger {
 }
 
 // getLogLeverFromEnv utiliza o nivel do log definido na env, padrão é info.
-func getLogLevelFromEnv() zapcore.Level {
-	levelStr := strings.ToLower(os.Getenv("LOG_LEVEL"))
+func getLogLevelFromEnv(logLevel string) zapcore.Level {
+	levelStr := strings.ToLower(logLevel)
 	switch levelStr {
 	case "debug":
 		return zap.DebugLevel

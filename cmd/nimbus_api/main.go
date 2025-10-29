@@ -5,17 +5,20 @@ import (
 	"time"
 
 	"github.com/ADStefano/AmazonHandler/s3handler"
+	"github.com/ADStefano/NimbusAPI/internal/api/router"
 	"github.com/ADStefano/NimbusAPI/internal/config"
 	"github.com/ADStefano/NimbusAPI/internal/database/repository"
 	"github.com/ADStefano/NimbusAPI/internal/logger"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 func main() {
 
-	zlog := logger.CreateLogger()
+	cfg := config.LoadConfig()
+	zlog := logger.CreateLogger(cfg.LogLevel)
 	defer zlog.Sync()
 
 	cfgS3, err := awsConfig.LoadDefaultConfig(context.Background())
@@ -36,7 +39,6 @@ func main() {
 		zlog.Info("Objeto encontrado", zap.String("key", *o.Key), zap.Int64("tamanho", *o.Size))
 	}
 
-	cfg := config.LoadConfig()
 	db, err := repository.Conect(cfg.DB_CONN)
 	if err != nil {
 		zlog.Error("Erro ao conectar com o banco de dados. (%e)", zap.Error(err))
@@ -44,5 +46,13 @@ func main() {
 
 	print(db)
 	// db.AutoMigrate(&models.Objects{}, &models.Buckets{}, &models.Executions{})
+	router := router.CreateRouter(zlog)
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "PETECO PETECO PETECO",
+		})
+	})
+
+	router.Run(cfg.Port)
 
 }
