@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/ADStefano/NimbusAPI/internal/api/middleware"
+	"github.com/ADStefano/NimbusAPI/internal/config"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type Route struct {
@@ -14,14 +14,14 @@ type Route struct {
 	Auth    bool
 }
 
-func RegisterRoutes(log *zap.Logger, router *gin.Engine) *gin.Engine {
+func RegisterRoutes(cfg *config.App, router *gin.Engine) *gin.Engine {
 
-	routes := CreateBucketRoutes()
+	routes := CreateBucketRoutes(*cfg.BucketConfig.Controller)
 	for _, route := range routes {
 		if route.Auth {
-			router.Handle(route.Method, route.Path, middleware.LoggerMiddleware(log), route.Handler)
+			router.Handle(route.Method, route.Path, middleware.LoggerMiddleware(cfg.Logger), route.Handler)
 		} else {
-			router.Handle(route.Method, route.Path, middleware.LoggerMiddleware(log), route.Handler)
+			router.Handle(route.Method, route.Path, middleware.LoggerMiddleware(cfg.Logger), route.Handler)
 		}
 	}
 	return router

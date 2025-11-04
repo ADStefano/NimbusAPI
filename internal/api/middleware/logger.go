@@ -10,6 +10,7 @@ import (
 func LoggerMiddleware(log *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
+		c.Set("logger", log)
 		start := time.Now()
 
 		log.Info("Request",
