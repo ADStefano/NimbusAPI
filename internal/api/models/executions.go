@@ -1,6 +1,9 @@
 package models
 
-import "database/sql/driver"
+import (
+	"database/sql/driver"
+	"time"
+)
 
 type status string
 
@@ -22,19 +25,19 @@ func (s status) Value() (driver.Value, error) {
 
 // Necesário criar o status antes no banco de dados
 type Executions struct {
-	Objects Objects `gorm:"foreignKey:ObjectID"`
-	ID         uint   `gorm:"primaryKey;autoIncrement;unique;not null"`
-	BucketID   uint   `gorm:"not null;index;"`
-	ObjectID   uint   `gorm:"not null;index;foreignKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Status     status `gorm:"type:status;not null;default:'PENDING'"`
-	StartedAt  int64  `gorm:"autoCreateTime"`
-	EndedAt    int64  `gorm:""`
-	CreatedAt  int64  `gorm:"autoCreateTime"`
-	UpdatedAt  int64  `gorm:"autoUpdateTime"`
-	ExecutedBy string `gorm:"not null;size:32"`
-	Success    bool   `gorm:"not null;default:false"`
+	Objects    Objects   `gorm:"foreignKey:ObjectID"`
+	ID         uint      `gorm:"primaryKey;autoIncrement;unique;not null"`
+	BucketID   uint      `gorm:"not null;index;"`
+	ObjectID   uint      `gorm:"not null;index;foreignKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Status     status    `gorm:"type:status;not null;default:'PENDING'"`
+	StartedAt  time.Time `gorm:"autoCreateTime"`
+	EndedAt    time.Time `gorm:""`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
+	UpdatedAt  time.Time `gorm:"autoUpdateTime"`
+	ExecutedBy string    `gorm:"not null;size:32"`
+	Success    bool      `gorm:"not null;default:false"`
 }
 
 func (Executions) TableName() string {
-    return "executions"
+	return "executions"
 }
